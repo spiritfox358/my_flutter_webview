@@ -10,7 +10,7 @@ class WebViewPageFullScreen extends StatefulWidget {
   const WebViewPageFullScreen({super.key, required this.url});
 
   @override
-  _WebViewPageFullScreenState createState() => _WebViewPageFullScreenState();
+  State<WebViewPageFullScreen> createState() => _WebViewPageFullScreenState();
 }
 
 class _WebViewPageFullScreenState extends State<WebViewPageFullScreen> {

@@ -48,13 +48,14 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-
+  flutter_native_splash: ^2.0.6
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  assets:
+    - assets/splash.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -90,3 +91,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_native_splash:
+  color: "#FFFFFF" # 设置背景颜色
+  image: assets/splash.png # 指定开屏图片路径
+  android: true # 启用 Android 开屏图
+  ios: true # 启用 iOS 开屏图
+  android_gravity: center # 图片在屏幕上的位置
+  ios_content_mode: center # iOS 中图片的显示模式
+  web: false # 如果不需要 Web 开屏图，可设置为 false

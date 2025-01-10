@@ -9,7 +9,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController _urlController = TextEditingController(); // 控制器用于获取输入的 URL
+  final TextEditingController _urlController =
+      TextEditingController(); // 控制器用于获取输入的 URL
 
   @override
   void dispose() {
@@ -39,8 +40,10 @@ class _HomePageState extends State<HomePage> {
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue), // 输入框聚焦时的底部边框颜色
                 ),
-                labelText: 'Enter URL', // 输入框提示文本
-                hintText: 'e.g. https://example.com', // 提示内容
+                labelText: 'Enter URL',
+                // 输入框提示文本
+                hintText: 'e.g. https://example.com',
+                // 提示内容
                 hintStyle: TextStyle(color: Colors.grey), // 提示文字样式
               ),
               keyboardType: TextInputType.url, // 设置键盘类型为 URL
@@ -49,7 +52,8 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
               onPressed: () {
                 final url = _urlController.text; // 获取用户输入的 URL
-                if (url.isNotEmpty && Uri.tryParse(url)?.hasAbsolutePath == true) {
+                if (url.isNotEmpty &&
+                    Uri.tryParse(url)?.hasAbsolutePath == true) {
                   // 验证 URL 的合法性
                   Navigator.push(
                     context,
@@ -88,7 +92,8 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        WebViewPageFullScreen(url: 'http://124.222.191.23:281'),
+                        // WebViewPageFullScreen(url: 'http://124.222.191.23:281'),
+                        WebViewPageFullScreen(url: 'http://10.72.206.101/'),
                   ),
                 );
               },

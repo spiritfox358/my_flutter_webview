@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_flutter_webview/pages/splash_screen.dart';
 import 'pages/home_page.dart';
 
 void main() {
@@ -16,7 +17,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
+      // home: HomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => SplashScreen(),
+        '/home': (context) => HomePage(), // Replace with your home screen
+      },
     );
   }
 }
