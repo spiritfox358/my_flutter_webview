@@ -93,11 +93,11 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                     builder: (context) =>
                         // WebViewPageFullScreen(url: 'http://124.222.191.23:281'),
-                        WebViewPageFullScreen(url: 'http://10.72.206.101/'),
+                        WebViewPageFullScreen(url: 'https://www.efzxt.com/mtecp_pc/index.html#/quit/login'),
                   ),
                 );
               },
-              child: const Text('Test Environment'),
+              child: const Text('Fzxt'),
             ),
             const SizedBox(height: 20), // 间隔
             ElevatedButton(

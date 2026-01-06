@@ -6,7 +6,7 @@ import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:image_picker/image_picker.dart';
 
 class WebViewPageFullScreen extends StatefulWidget {
-  final String url; // 接收 URL 参数
+  final String url;
   const WebViewPageFullScreen({super.key, required this.url});
 
   @override
@@ -15,17 +15,55 @@ class WebViewPageFullScreen extends StatefulWidget {
 
 class _WebViewPageFullScreenState extends State<WebViewPageFullScreen> {
   late final WebViewController _controller;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // 隐藏状态栏
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Color(0xFF155ABF),
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+    ));
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (String url) {
+            setState(() => _isLoading = true);
+          },
+          onPageFinished: (String url) {
+            setState(() => _isLoading = false);
+          },
+        ),
+      )
       ..loadRequest(Uri.parse(widget.url));
-    // 配置文件选择器
+
     setupFilePicker();
+  }
+
+  // 弹出退出确认对话框
+  Future<bool> _showExitConfirmation(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('提示'),
+        content: const Text('确定要退出当前页面并返回首页吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // 不退出
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true), // 确定退出
+            child: const Text('确定', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    ) ??
+        false;
   }
 
   void setupFilePicker() {
@@ -33,35 +71,19 @@ class _WebViewPageFullScreenState extends State<WebViewPageFullScreen> {
       final controller = _controller.platform as AndroidWebViewController;
       controller.setOnShowFileSelector((FileSelectorParams params) async {
         final picker = ImagePicker();
-        // 弹出选择来源对话框
         final ImageSource? source = await showDialog<ImageSource>(
           context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('选择图片来源'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, ImageSource.camera),
-                  child: Text('拍照'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, ImageSource.gallery),
-                  child: Text('相册'),
-                ),
-              ],
-            );
-          },
+          builder: (context) => AlertDialog(
+            title: const Text('选择图片来源'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context, ImageSource.camera), child: const Text('拍照')),
+              TextButton(onPressed: () => Navigator.pop(context, ImageSource.gallery), child: const Text('相册')),
+            ],
+          ),
         );
-        // 如果用户未选择，返回空
         if (source == null) return [];
-
-        // 选择文件或拍照
         final XFile? file = await picker.pickImage(source: source);
-        if (file == null) return []; // 用户未选择文件或拍照取消
-
-        print("Selected file path: ${file.path}");
-
-        // 返回文件路径
+        if (file == null) return [];
         return [Uri.file(file.path).toString()];
       });
     }
@@ -69,9 +91,44 @@ class _WebViewPageFullScreenState extends State<WebViewPageFullScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: WebViewWidget(
-        controller: _controller,
+    return PopScope(
+      canPop: false, // 拦截所有返回操作
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        // 1. 先检查 WebView 内部是否可以回退（比如从网页二级页面回到一级页面）
+        if (await _controller.canGoBack()) {
+          await _controller.goBack();
+        } else {
+          // 2. 如果已经在网页首页，点击返回键则弹出确认框
+          if (context.mounted) {
+            bool shouldPop = await _showExitConfirmation(context);
+            if (shouldPop) {
+              // 用户点击了“确定”，退出到 Flutter 的 HomePage
+              Navigator.of(context).pop();
+            }
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF155ABF),
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Container(
+                color: Colors.white,
+                child: WebViewWidget(controller: _controller),
+              ),
+              if (_isLoading)
+                Container(
+                  color: Colors.white,
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF155ABF)),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

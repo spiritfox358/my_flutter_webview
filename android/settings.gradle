@@ -1,13 +1,18 @@
-pluginManagement {
-    def flutterSdkPath = {
-        def properties = new Properties()
-        file("local.properties").withInputStream { properties.load(it) }
-        def flutterSdkPath = properties.getProperty("flutter.sdk")
-        assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
-        return flutterSdkPath
-    }()
+import java.util.Properties
 
-    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+pluginManagement {
+    // 读取 flutter.sdk 路径
+    def props = new Properties()
+    def localPropsFile = file("local.properties")
+    assert localPropsFile.exists() : "local.properties not found in android/"
+
+    localPropsFile.withInputStream { props.load(it) }
+
+    def flutterSdkPath = props.getProperty("flutter.sdk")
+    assert flutterSdkPath != null : "flutter.sdk not set in android/local.properties"
+
+    // ✅ 关键：把 Flutter SDK 里的 Gradle 插件 include 进来
+    includeBuild("${flutterSdkPath}/packages/flutter_tools/gradle")
 
     repositories {
         google()
@@ -17,9 +22,12 @@ pluginManagement {
 }
 
 plugins {
+    // ✅ Flutter 插件加载器（新模板必须有）
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    id "com.android.application" version "8.1.0" apply false
-    id "org.jetbrains.kotlin.android" version "1.8.22" apply false
+
+    // 你项目用的 AGP + Kotlin 版本（按你之前的要求）
+    id "com.android.application" version "8.1.1" apply false
+    id "org.jetbrains.kotlin.android" version "1.9.22" apply false
 }
 
 include ":app"
