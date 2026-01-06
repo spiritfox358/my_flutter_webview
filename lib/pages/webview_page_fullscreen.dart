@@ -48,19 +48,83 @@ class _WebViewPageFullScreenState extends State<WebViewPageFullScreen> {
   Future<bool> _showExitConfirmation(BuildContext context) async {
     return await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('提示'),
-        content: const Text('确定要退出当前页面并返回首页吗？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false), // 不退出
-            child: const Text('取消'),
+      barrierDismissible: false, // 点击背景不关闭，强制用户选择
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16), // 圆角
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // 高度自适应内容
+            children: [
+              // 顶部图标
+              const Icon(
+                Icons.exit_to_app_rounded,
+                color: Color(0xFF155ABF),
+                size: 48,
+              ),
+              const SizedBox(height: 16),
+              // 标题
+              const Text(
+                '确认退出',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              // 内容描述
+              const Text(
+                '您确定要离开当前页面并返回首页吗？未保存的内容可能会丢失。',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+              const SizedBox(height: 24),
+              // 按钮行
+              Row(
+                children: [
+                  // 取消按钮
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF155ABF)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        '取消',
+                        style: TextStyle(color: Color(0xFF155ABF)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // 确定按钮
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF155ABF),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        '确定退出',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true), // 确定退出
-            child: const Text('确定', style: TextStyle(color: Colors.red)),
-          ),
-        ],
+        ),
       ),
     ) ??
         false;
